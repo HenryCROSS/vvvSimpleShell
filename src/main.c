@@ -1,17 +1,49 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+#include <sys/wait.h>
 
 #define LSH_TOK_BUFSIZE 64
 #define LSH_TOK_DELIM " \t\r\n\a"
 
+int lsh_launch(char **args)
+{
+    pid_t pid, wpid;
+    int status;
+
+    pid = fork();
+    if (pid == 0)
+    {
+        if (execvp(args[0], args) == -1)
+        {
+            perror("lsh");
+        }
+        exit(EXIT_FAILURE);
+    }
+    else if (pid < 0)
+    {
+        // Error forking
+        perror("lsh");
+    }
+    else
+    {
+        do
+        {
+            wpid = waitpid(pid, &status, WUNTRACED);
+        } while (!WIFCONTINUED(status) && !WIFSIGNALED(status));
+    }
+
+    return 1;
+}
+
 char **lsh_split_line(char *line)
 {
     int bufszie = LSH_TOK_BUFSIZE, position = 0;
-    char** tokens = malloc(bufszie * sizeof(char*));
-    char* token;
+    char **tokens = malloc(bufszie * sizeof(char *));
+    char *token;
 
-    if(!tokens)
+    if (!tokens)
     {
         fprintf(stderr, "lsh: allocation error\n");
         exit(EXIT_FAILURE);
@@ -26,8 +58,8 @@ char **lsh_split_line(char *line)
         if (position >= bufszie)
         {
             bufszie += LSH_TOK_BUFSIZE;
-            tokens = realloc(tokens, bufszie * sizeof(char*));
-            if(!tokens)
+            tokens = realloc(tokens, bufszie * sizeof(char *));
+            if (!tokens)
             {
                 fprintf(stderr, "lsh: allocation error\n");
                 exit(EXIT_FAILURE);

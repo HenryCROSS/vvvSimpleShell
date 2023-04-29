@@ -91,6 +91,11 @@ int lsh_launch(char **args)
         {
             // wait till the execvp return or the child process
             // is finished
+            // 
+            // WIFEXITED() return true if the chile terminated normally
+            // 
+            // WIFSIGNALED() return true if the child terminated because
+            // it received a signal that was not handled
             wpid = waitpid(pid, &status, WUNTRACED);
         } while (!WIFEXITED(status) && !WIFSIGNALED(status));
     }
@@ -201,5 +206,5 @@ int main(int argc, char *argv[])
     lsh_loop();
 
     // Perform any shutdown/cleanup
-    return 0;
+    return EXIT_SUCCESS;
 }

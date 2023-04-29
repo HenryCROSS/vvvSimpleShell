@@ -39,13 +39,14 @@ void lsh_loop(void)
         free(line);
         free(args);
     } while (status);
+}
 
-    int main(int argc, char *argv[])
-    {
-        // Load config files, if any
-        // Run command loop.
-        lsh_loop();
+int main(int argc, char *argv[])
+{
+    // Load config files, if any
+    // Run command loop.
+    lsh_loop();
 
-        // Perform any shutdown/cleanup
-        return 0;
-    }
+    // Perform any shutdown/cleanup
+    return 0;
+}

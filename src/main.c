@@ -1,5 +1,45 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+
+#define LSH_TOK_BUFSIZE 64
+#define LSH_TOK_DELIM " \t\r\n\a"
+
+char **lsh_split_line(char *line)
+{
+    int bufszie = LSH_TOK_BUFSIZE, position = 0;
+    char** tokens = malloc(bufszie * sizeof(char*));
+    char* token;
+
+    if(!tokens)
+    {
+        fprintf(stderr, "lsh: allocation error\n");
+        exit(EXIT_FAILURE);
+    }
+
+    token = strtok(line, LSH_TOK_DELIM);
+    while (token != NULL)
+    {
+        tokens[position] = token;
+        position++;
+
+        if (position >= bufszie)
+        {
+            bufszie += LSH_TOK_BUFSIZE;
+            tokens = realloc(tokens, bufszie * sizeof(char*));
+            if(!tokens)
+            {
+                fprintf(stderr, "lsh: allocation error\n");
+                exit(EXIT_FAILURE);
+            }
+        }
+
+        token = strtok(NULL, LSH_TOK_DELIM);
+    }
+
+    tokens[position] = NULL;
+    return tokens;
+}
 
 char *lsh_read_line(void)
 {

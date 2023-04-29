@@ -92,7 +92,7 @@ int lsh_launch(char **args)
             // wait till the execvp return or the child process
             // is finished
             wpid = waitpid(pid, &status, WUNTRACED);
-        } while (!WIFCONTINUED(status) && !WIFSIGNALED(status));
+        } while (!WIFEXITED(status) && !WIFSIGNALED(status));
     }
 
     return 1;
